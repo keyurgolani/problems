@@ -1,0 +1,120 @@
+#!/usr/bin/env python3
+
+import sys
+import argparse
+
+
+class Problems:
+
+    lookup = {}
+
+    @staticmethod
+    def enact(problem_key, invocation):
+        try:
+            problem = Problems.lookup[problem_key]
+            getattr(problem, invocation)()
+        except KeyError:
+            print('No problem with name %s available.' % problem_key)
+
+    def __init__(self):
+        parser = argparse.ArgumentParser(
+            description='Deals with problems',
+            usage='''problems <command> [<args>]
+            
+            
+            The most commonly used git commands are:
+   list      Lists the problems that are available.
+   solve     Prints sample input. Runs the problem with sample input. And prints output.
+   show      Prints the solution (code).
+   test      Runs all the relevant inputs on the problem.
+   define    Prints the problem definition.
+   detail    Gives every detail available about a problem.
+''')
+        # Create Parser object.
+        parser = argparse.ArgumentParser(description='Deals with problems')
+        # Add number of command line arguments.
+        parser.add_argument('command', help='Sub-command to run')
+        # parse_args defaults to [1:] for args, but you need to
+        # exclude the rest of the args too, or validation will fail
+        args = parser.parse_args(sys.argv[1:2])
+        if not hasattr(self, args.command):
+            print('Unrecognized command')
+            parser.print_help()
+            exit(1)
+        # use dispatch pattern to invoke method with same name
+        getattr(self, args.command)()
+
+    @staticmethod
+    def list():
+        parser = argparse.ArgumentParser(
+            description='Lists the problems that are available.')
+        # prefixing the argument with -- means it's optional
+        parser.add_argument('--sort', dest='sort', action='store_true')
+        # now that we're inside a sub-command, ignore the first
+        # TWO argvs, ie the command (problems) and the sub-command (solve)
+        args = parser.parse_args(sys.argv[2:])
+        problems_list = Problems.lookup.keys()
+        print('\n'.join(sorted(problems_list) if args.sort else problems_list))
+
+    @staticmethod
+    def solve():
+        parser = argparse.ArgumentParser(
+            description='Prints sample input. Runs the problem with sample input. And prints output.')
+        # prefixing the argument with -- means it's optional
+        parser.add_argument('problem')
+        # now that we're inside a sub-command, ignore the first
+        # TWO argvs, ie the command (problems) and the sub-command (solve)
+        args = parser.parse_args(sys.argv[2:])
+        Problems.enact(args.problem, 'solve')
+
+    @staticmethod
+    def show():
+        parser = argparse.ArgumentParser(
+            description='Prints the solution (code).')
+        # prefixing the argument with -- means it's optional
+        parser.add_argument('problem')
+        # now that we're inside a sub-command, ignore the first
+        # TWO argvs, ie the command (problems) and the sub-command (solve)
+        args = parser.parse_args(sys.argv[2:])
+        Problems.enact(args.problem, 'show')
+
+    @staticmethod
+    def test():
+        parser = argparse.ArgumentParser(
+            description='Runs all the relevant inputs on the problem.')
+        # prefixing the argument with -- means it's optional
+        parser.add_argument('problem')
+        # now that we're inside a sub-command, ignore the first
+        # TWO argvs, ie the command (problems) and the sub-command (solve)
+        args = parser.parse_args(sys.argv[2:])
+        Problems.enact(args.problem, 'test')
+
+    @staticmethod
+    def define():
+        parser = argparse.ArgumentParser(
+            description='Prints the problem definition.')
+        # prefixing the argument with -- means it's optional
+        parser.add_argument('problem')
+        # now that we're inside a sub-command, ignore the first
+        # TWO argvs, ie the command (problems) and the sub-command (solve)
+        args = parser.parse_args(sys.argv[2:])
+        Problems.enact(args.problem, 'define')
+
+    @staticmethod
+    def detail():
+        parser = argparse.ArgumentParser(
+            description='Gives every detail available about a problem.')
+        # prefixing the argument with -- means it's optional
+        parser.add_argument('problem')
+        # now that we're inside a sub-command, ignore the first
+        # TWO argvs, ie the command (problems) and the sub-command (solve)
+        args = parser.parse_args(sys.argv[2:])
+        Problems.enact(args.problem, 'detail')
+
+    @staticmethod
+    def dummy():
+        print(Problems.lookup)
+
+
+if __name__ == '__main__':
+    Problems()
